@@ -1,8 +1,9 @@
 import axios from 'axios';
 import qs from 'qs';
 import router from '../router';
-axios.defaults.baseURL = "/";
+axios.defaults.baseURL = "http://192.168.3.107:8087/";
 axios.defaults.timeout = 5000;
+axios.defaults.withCredentials=false;
 
 /**
  * 封装get方法

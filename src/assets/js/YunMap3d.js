@@ -6,12 +6,13 @@
 
 import * as THREE from "three";
 import OrbitControls from 'three-orbitcontrols'
-// import {post,get,patch,put} from "../axiostool.js"
 import Mall from './Mall'
 import {CSS2DObject, CSS2DRenderer} from "./CSS2DObject";
 
-import data from '../data/xxx.json'
+import data from '../data/nmsc.json'
 import DataFactory from "./DataFactory";
+
+
 
 
 export default class {
@@ -217,7 +218,7 @@ export default class {
     if (this.showNames){
       this.renderer.clear();
       this.renderer.render(this.scene,this.camera);
-      this.camera.position.set(500, 700, 1000);//设置相机位置
+      this.camera.position.set(0, 3000, 0);//设置相机位置
       this.showNames = false;
     }
 
@@ -228,19 +229,24 @@ export default class {
 
 
     //从缓存中获取数据
-    /*let json = DataFactory.getLocalStorage('building');
-    if (json === undefined || json.data.outline.length === 0){
-      // 从文件读取JSON数据
-      json = data;
-    }*/
-
-    let json = data;
+    // let json = DataFactory.getLocalStorage('nmsc');
+    // if (json === undefined || json.data.outline.length === 0){
+    //   // 从文件读取JSON数据
+    //   json = data;
+    // }
+    let json;
+    let fid  = (decodeURIComponent((new RegExp('[?|&]' + 'fid' + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null);
+    if(fid){
+      json = url;
+    }else{
+      json = DataFactory.getLocalStorage('building');
+    }
 
         // 楼层模型
     this.mall = new Mall();
     this.mall.is3d = this.is3d;
 
-    // 解析模型
+    // 解析模型 
     this.mall.parseModel(json,mold,theme);
 
     this.scene.add(this.mall.root);

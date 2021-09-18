@@ -168,6 +168,64 @@ export default class {
     this.scene.add(obj);
   };
 
+    // 重新刷新模型店铺高亮显示
+    refreshModelWithShop(floor,fid){
+      this.sceneClear();
+      let obj = new THREE.Object3D();
+      obj._name = 'drawing';
+  
+      //渲染地板
+      if (floor.floor.length > 0){
+        let line = this.creatModel(floor.floor);
+        obj.add(line);
+      }
+  
+      //渲染商店
+      if (floor.shops.length > 0){
+        for (let i = 0; i < floor.shops.length; i++) {
+          let line = null;
+          if(fid == floor.shops[i].fid){
+            line = this.creatModelWithColour(floor.shops[i].outline,"	#FFFF00");
+          }else{
+            line = this.creatModel(floor.shops[i].outline);
+          }
+          obj.add(line);
+        }
+      }
+  
+      //渲染路径
+      if (floor.paths.length > 0){
+        for (let i = 0; i < floor.paths.length; i++) {
+          let path = floor.paths[i];
+          let line = this.creatModel(path.outline);
+          for (let j = 0; j < path.outline.length ; j++) {
+            this.mark(path.outline[j][0],path.outline[j][1],line);
+          }
+          obj.add(line);
+        }
+      }
+  
+      //渲染公共点
+      if (floor.public.length > 0){
+        for (let i = 0; i < floor.public.length; i++) {
+  
+          if (floor.public[i].coord.length === 0 ){
+            return;
+          }
+  
+          let sphereGeo = new THREE.SphereGeometry(10, 10, 0);//创建公共点球体
+          let sphereMat = new THREE.MeshLambertMaterial({//创建材料
+            color:0x3d3b4f,
+            wireframe:false
+          });
+          let sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);//创建球体网格模型
+          sphereMesh.position.set(floor.public[i].coord[0], floor.public[i].coord[1], 0);//设置球的坐标
+          obj.add(sphereMesh);
+        }
+      }
+      this.scene.add(obj);
+    };
+
   // 创建绘画的模型
   creatModel(xy){
     let points = [];
@@ -189,6 +247,28 @@ export default class {
     line.position.set(0, 0, 0.5);
     return line;
   }
+
+    // 创建可以指定颜色的绘画的模型
+    creatModelWithColour(xy,colour){
+      let points = [];
+      //处理向量
+      for (let j = 0; j < xy.length; j++) {
+        let point = new THREE.Vector2(xy[j][0], xy[j][1]);
+        points.push(point);
+      }
+      let pointsGeometry = new THREE.Geometry().setFromPoints(points);
+      // 线条
+      let config = {
+        color: colour,
+        opacity: 5,
+        transparent: true,
+        linewidth: 1
+      };
+      // 生成线
+      let line = new THREE.Line(pointsGeometry, new THREE.LineBasicMaterial(config));
+      line.position.set(0, 0, 0.5);
+      return line;
+    }
 
   /** 删除原来的模型*/
   sceneClear(){

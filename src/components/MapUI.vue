@@ -5,16 +5,83 @@
         <div @click="cutFloors" :data="id" style="width: 70px;float: left;">&nbsp;&nbsp;{{index.name}}</div>
          <span @click="removeFloorName(index._id)">✕</span>
       </div>
-      <div class="plus" @click="addFloor"><i class="iconfont icon-xinjiangongcheng" style="font-size: 25px;"></i></div>
-
+      <div class="plus" @click="lookMap">
+        <el-tooltip content="预览地图" placement="bottom" effect="light">
+          <i class="iconfont icon-yduizhekou" style="font-size: 25px;"></i>
+        </el-tooltip>
+      </div>
+      <div class="plus" @click="keepShow">
+        <el-tooltip content="保存地图" placement="bottom" effect="light">
+          <i class="iconfont icon-liebiao" style="font-size: 25px;"></i>
+        </el-tooltip>
+      </div>
+      <div class="plus" @click="addFloor">
+        <el-tooltip content="保存楼层" placement="bottom" effect="light">
+          <i class="iconfont icon-xinjiangongcheng" style="font-size: 25px;"></i>
+        </el-tooltip>
+      </div>
+      <!-- 模态框 -->
+      <div class="modal" :style="{'display':floorDisplay}">
+        <!-- Modal content -->
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4>保存楼层</h4>
+            <span @click="addFloor" class="close">x</span>
+          </div>
+          <div class="modal-body">
+            <form role="form">
+              <div class="form-group">
+                <label for="name" style="color: #333;text-align: left;display: block;font-size: 14px;">* 楼层名称</label>
+                <input type="text" class="form-control" id="floorName"
+                    placeholder="请输入楼层名称">
+              </div>
+              <div class="form-group">
+                <label for="inputfile" style="color: #333;text-align: left;display: block;font-size: 14px;">* 楼层底图</label>
+                <input type="file" id="floorMap" style="position: absolute;left: 20px;font-size:14px;color:black">
+              </div>
+              <p class="help-block" style="color:black;">填写楼层名称和楼层地图后，点击保存。</p>
+              <el-button type="primary" @click="addFloorName" >保存楼层</el-button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <!-- 保存楼层 -->
       <div class="add" :class="floorShow">
         <div @click="addFloor" style="color:#000000;height: 35px;line-height:35px;font-size: 16px;text-align: right;padding-right: 12px;">
           ✕
         </div>
-        <input type="text" value="" id="floorName" style="text-align: center;">
-        <span>* 新建楼层第一步是需要画出建筑的轮廓图，方便渲染地板，默认是创建好，选中直接画就可以.</span>
-
+        <div style="margin:50px 100px 50px 100px">
+          <div>
+            <label style="color:black;font-size:14px;">* 楼层名称：</label>
+            <input id="floorName2" style="margin-top:20px;"></input>
+          </div>
+          <div>
+            <label style="color:black;font-size:14px;">* 楼层底图：</label>
+            <input type="file" id="floorMap2" style="font-size:14px;margin-top:20px;color:black"></input>
+          </div>
+        </div>
         <div><button type="button" @click="addFloorName">保存楼层</button></div>
+      </div>
+      <!-- 模态框 -->
+      <div class="modal" :style="{'display':keepShopMapShow}">
+        <!-- Modal content -->
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4>保存地图</h4>
+            <span @click="closeMap" class="close">x</span>
+          </div>
+          <div class="modal-body">
+            <form role="form">
+              <div class="form-group">
+                <label for="name" style="color: #333;text-align: left;display: block;font-size: 14px;">* 地图名称</label>
+                <input type="text" class="form-control" v-model="mapName"
+                    placeholder="请输入地图名称">
+              </div>
+              <p class="help-block" style="color:black;">填写地图名称后，点击保存。</p>
+              <el-button type="primary" @click="keepMap" >保存地图</el-button>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -22,15 +89,15 @@
     <div class="menu-letf">
       <div class="button">
         <div class="icon tool-checked"  @click="toolFun" data="share" title="描绘地图"><i class="iconfont icon-huituguanlixinxi"></i></div>
-        <div class="icon" @click="toolFun" data="weizhi" title="当前位置"><i class="iconfont icon-weizhi" style="font-size: 21px;"></i></div>
-        <div class="icon" title="地基模型"><i class="iconfont icon-icon-test" style="font-size: 21px;"></i></div>
-        <div style="border-bottom: solid 1px #B1B0B1;"></div>
-        <div class="icon" @click="toolFun" data="floor" title="楼层地板"><i class="iconfont icon-dibandiaodinganzhuang" style="font-size: 23px;"></i></div>
+        <div v-if="false" class="icon" @click="toolFun" data="weizhi" title="当前位置"><i class="iconfont icon-weizhi" style="font-size: 21px;"></i></div>
+        <div v-if="false" class="icon" title="地基模型"><i class="iconfont icon-icon-test" style="font-size: 21px;"></i></div>
+        <div v-if="false" style="border-bottom: solid 1px #B1B0B1;"></div>
+        <div v-if="false" class="icon" @click="toolFun" data="floor" title="楼层地板"><i class="iconfont icon-dibandiaodinganzhuang" style="font-size: 23px;"></i></div>
         <div class="icon" @click="toolFun" data="shops" title="店铺列表"><i class="iconfont icon-louceng"></i></div>
         <div class="icon" @click="toolFun" data="public" title="公共区域"><i class="iconfont icon-gonggong" style="font-size: 18px;"></i></div>
-        <div class="icon" @click="toolFun" data="path" title="路径绘制"><i class="iconfont icon-lujingfenxi" style="font-size: 22px;"></i></div>
+        <div v-if="false" class="icon" @click="toolFun" data="path" title="路径绘制"><i class="iconfont icon-lujingfenxi" style="font-size: 22px;"></i></div>
         <div style="border-bottom: solid 1px #B1B0B1;"></div>
-        <div class="icon"><i class="iconfont icon-tupian" style="font-size: 21px;"></i><input type="file" @change="getFile" data="map"></div>
+        <div v-if="false" class="icon"><i class="iconfont icon-tupian" style="font-size: 21px;"></i><input type="file" @change="getFile" data="map"></div>
         <div class="icon" title="回上一步"><i @click="mapObj.rollback()" class="iconfont icon-fanhui1" style="font-size: 21px;"></i></div>
         <div style="border-bottom: solid 1px #B1B0B1;"></div>
         <div class="icon" @click="clear" title="清空数据"><i class="iconfont icon-jinzhi1" style="font-size: 21px;"></i></div>
@@ -70,16 +137,68 @@
         </div>
       </div>
     </div>
-    <div class="menu-right" :style="{right: rightShow + 'px'}">
+    <div class="menu-right" v-if="isShop" :style="{right: rightShow + 'px'}">
       <div class="head">
         <span style="float: left;" @click="choiceProperty">
           <i class="iconfont icon-daohangnavigate4" v-if="rightShow > 0" style="font-size: 25px;"></i>
           <i class="iconfont icon-daohangnavigate5" v-else-if="rightShow < 0" style="font-size: 25px;"></i>
         </span>
         属性编辑</div>
-      <div style="margin-top: 60px">
+      <div style="margin-top: 40px">
         <div class="property" v-if="!isPublic">
-          <span>商店编号</span><input type="text" v-model="form.shopNo">
+          <span>商店编号</span><input type="text" style="width:100px" v-model="form.shopNo">&nbsp;&nbsp;
+          <el-button type="primary" size="mini" @click="showBranch">选择</el-button>
+        </div>
+        <!-- 摊位选择 -->
+        <div class="modal" :style="{'display':branchSelectShow}">
+          <!-- Modal content -->
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4>摊位选择</h4>
+              <span @click="closeBranch" class="close">x</span>
+            </div>
+            <div class="modal-body">
+              <span>组织名称/编码</span><input type="text" v-model="branchSelectName" style="width:120px">&nbsp;&nbsp;<el-button type="primary" size="mini" @click="selectBranchList">查询</el-button><el-button type="primary" size="mini" @click="branchNameReset">重置</el-button>
+              <br>
+              <br>
+              <el-table
+                :data="branchList"
+                style="width: 100%"
+                max-height="500"
+                row-key="fid"
+                :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
+                <el-table-column
+                  fixed
+                  prop="branchName"
+                  label="组织名称"
+                  width="150">
+                </el-table-column>
+                <el-table-column
+                  prop="branchCode"
+                  label="组织编号"
+                  width="120">
+                </el-table-column>
+                <el-table-column
+                  prop="shortName"
+                  label="助记码"
+                  width="120">
+                </el-table-column>
+                <el-table-column
+                  fixed="right"
+                  label="操作"
+                  width="100">
+                  <template slot-scope="scope">
+                    <el-button
+                      @click.native.prevent="selectBranch(scope.row)"
+                      type="text"
+                      size="small">
+                      选择
+                    </el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+          </div>
         </div>
         <div class="property">
           <span>商店名称</span><input type="text" v-model="form.name">
@@ -95,7 +214,7 @@
         </div>
         <div class="property">
           <span>点击展示</span>
-          <div class="icon green" v-if="form.isShow">
+          <div class="icon green" v-if="form.isShow" style="height: 0px;">
             <i class="iconfont icon-kaiguan3" style="font-size: 28px;" @click="form.isShow = false"></i>
           </div>
           <div class="icon red" v-else>
@@ -104,7 +223,7 @@
         </div>
         <div class="property" v-if="!isPublic">
           <span>建筑类型</span>
-          <select v-model="form.category" style="font-size: 14px;padding: 2px;">
+          <select v-model="form.category" style="font-size: 14px;padding: 2px;margin-left: 30px;">
             <option value="0">空铺</option>
             <option value="1">正常</option>
             <option value="2">推荐</option>
@@ -139,17 +258,16 @@
         </div>
         <div class="property" v-if="!isPublic">
           <span>商店介绍</span>
-          <div style="float: right;margin-right: 18px;margin-top: -15px">
-            <textarea rows="5" cols="22" style="resize: none;" v-model="form.remark"></textarea>
+          <div style="float: right;margin-right: 18px;">
+            <textarea rows="3" cols="22" style="resize: none;" v-model="form.remark"></textarea>
           </div>
         </div>
         <br /> <br />
-        <div class="property" style="color: #a72525;font-size: 12px;padding-left: 15px;">
-          * 地板不用填任何属性直接保存，一定要画地板。
+        <div class="property" style="color: #a72525;font-size: 12px;padding-left: 110px;">
+          * 商店基本属性必填。
         </div>
-
         <div class="property" style="text-align: center;">
-          <button type="button" @click="editor" v-if="!isPublic">修改</button> &nbsp;&nbsp; <button type="button" @click="submit">增加</button>
+          <el-button type="primary" size="mini" @click="editor" v-if="!isPublic">修改</el-button> &nbsp;&nbsp; <el-button type="primary" size="mini" @click="submit">增加</el-button>
         </div>
       </div>
     </div>
@@ -159,9 +277,13 @@
 <script>
   import DataFactory from "../assets/js/DataFactory";
   import MapEditor from "../assets/js/MapEditor";
+  import {post,get,patch,put} from "../assets/axiostool.js"
   export default {
       data() {
         return {
+          TheStyle:{
+              display:'none',
+          },
           mapObj : null,
           floors : [],
           floor : {
@@ -186,6 +308,7 @@
           colorShow: 'hidden',
           rightShow: '1',
           floorShow: 'hidden',
+          floorDisplay: 'none',
           form : {
             "_id" : -1,
             "shopNo" : "",
@@ -198,8 +321,14 @@
             "color" : "",
             "checked" : true,
             "remark" : "",
-            "outline" : []
-          }
+            "outline" : [],
+            "fid": "",
+          },
+          branchSelectShow: 'none',
+          keepShopMapShow: 'none',
+          branchList: [],
+          branchSelectName : "",
+          mapName: "",
         };
       },
       methods: {
@@ -231,10 +360,15 @@
           document.body.setAttribute('style',i);
         },
         addFloor(){
-          if (this.floorShow === ''){
-            this.floorShow = 'hidden';
+          //if (this.floorShow === ''){
+            //this.floorShow = 'hidden';
+          //} else {
+            //this.floorShow = '';
+          //}
+          if (this.floorDisplay === 'none'){
+            this.floorDisplay = 'block';
           } else {
-            this.floorShow = '';
+            this.floorDisplay = 'none';
           }
         },
         toolFun(e){
@@ -307,6 +441,14 @@
           this.colorShow = 'hidden';
         },
         addFloorName(){
+          if(document.getElementById('floorName').value == ''){
+            this.$message('请输入楼层名称！');
+            return false;
+          }
+          if(document.getElementById('floorMap').files.length<=0){
+            this.$message('请选择楼层底图！');
+            return false;
+          }
           let json = DataFactory.getLocalStorage('building');
           let floors = json.data.storey;
 
@@ -330,15 +472,34 @@
 
           // 渲染画的线
           this.drawing();
-          // 编辑数据还原
-          DataFactory.putLocalStorage('xy',[]);
+          //加载选择的背景图
+          let _this = this;
+          let floorMap = document.getElementById('floorMap');
+          let files = floorMap.files[0];
+          // 看支持不支持FileReader
+          if (!floorMap || !window.FileReader) return ;
+          let reader = new FileReader();
+          // 格式转换
+          reader.readAsDataURL(files); // 这里是最关键的一步，转换就在这里
+          reader.onloadend = function () {
+            let result = this.result;
+            let size = window.innerWidth * 0.7;
+             _this.floor.map = result;
+            let i = 'background-image: url(' +  this.result + ');background-size: ' + size + 'px;';
+            document.body.setAttribute('style',i);
+            var img=new Image();
+            //改变图片的src
+            img.src=_this.floor.map;
+            //加载完成执行
+            img.onload=function(){
+              _this.floor.floor = [[-img.width*0.87,img.height*0.87],[img.width*0.87,img.height*0.87],[img.width*0.87,-img.height*0.87],[-img.width*0.87,-img.height*0.87],[-img.width*0.87,img.height*0.87]];
+             _this.save();
+            };
+          }
+          //保存楼层
+          let size = window.innerWidth;
 
-          // 加载背景图片
-          let size = window.innerWidth * 0.7;
-          let i = 'background-image: url(' +  this.floor.map + ');background-size: ' + size + 'px;';
-          document.body.setAttribute('style',i);
-
-
+          //this.save();
 
 
 
@@ -381,6 +542,8 @@
           this.isEditor = true;
           this.form = JSON.parse(JSON.stringify(obj));
           document.getElementById(obj._id).style.background = '#7fecad'
+          //高亮显示轨迹
+          this.mapObj.refreshModelWithShop(this.floor,this.form.fid);
         },
 
         removeShop(obj){
@@ -397,14 +560,18 @@
         // 公用部分处理
         funPublic(t,obj){
           let txt = '确定要删除“' + obj.name + '”吗？';
-          if (confirm(txt)) {
+          this.$confirm(txt, '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
             for (let i = 0; i < this.floor.public.length; i++) {
               if (this.floor.public[i]._id === obj._id) {
                 this.floor.public.splice(i,1);
               }
             }
             this.save();
-          }
+          });
         },
         removePublic(obj){
           let txt = '确定要删除“' + obj.name + '”吗？';
@@ -438,6 +605,10 @@
           if (this.isShop) {
             this.form._id = this.floor.shops.length > 0 ? this.floor.shops[this.floor.shops.length - 1]._id + 1 : 0 ;
             this.form.outline = DataFactory.getLocalStorage('xy');
+            if(this.form.outline.length<=0){
+              this.$message('请先绘制店铺位置！');
+              return false;
+            }
             this.floor.shops.push(JSON.parse(JSON.stringify(this.form)));
             this.save();
           }
@@ -547,14 +718,58 @@
           DataFactory.removeLocalStorage('building');
           DataFactory.putLocalStorage('xy',[]);
           this.create();
+          //刷新页面
+          location. reload();
         },
-
+         keepShow(){
+          this.keepShopMapShow='block';
+        },
+        lookMap(){
+          let routeUrl = this.$router.resolve({
+                path: "/",
+          });
+          window.open(routeUrl .href, '_blank');
+        },
+        closeMap(){
+          this.keepShopMapShow='none';
+        },
+        keepMap(){
+          if(!this.mapName){
+            this.$message('请输入地图名称！');
+              return false;
+          }
+          let fid  = (decodeURIComponent((new RegExp('[?|&]' + 'fid' + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null);
+          if(fid){
+            post('api/branchplane/modify', {
+                mapName: this.mapName,
+                currentContext: JSON.stringify(DataFactory.getLocalStorage('building')),
+                fid: fid
+            }).then((res) => {
+                if(res.code==0){
+                  this.keepShopMapShow='none';
+                }else{
+                  this.$message('请登录！');
+                }
+            })
+          }else{
+            post('api/branchplane/add', {
+                mapName: this.mapName,
+                currentContext: JSON.stringify(DataFactory.getLocalStorage('building')),
+            }).then((res) => {
+                if(res.code==0){
+                  this.keepShopMapShow='none';
+                }else{
+                  this.$message('请登录！');
+                }
+            })
+          }
+        },
         create(){
           // 初始化地图
           let building = {
             "data" : {
-              "name" : "故宫博物院",
-              "address" : "北京市东城区景山前街4号",
+              "name" : "",
+              "address" : "",
               "remark" : "",
               "outline": [],
               "storey": []
@@ -579,11 +794,70 @@
         mapEditor(dom){
           //todo 把模型加载写在了子类，为了方便调用生成画的模型
           this.mapObj = new MapEditor(dom);
-          this.create();
-        }
+          let fid  = (decodeURIComponent((new RegExp('[?|&]' + 'fid' + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null);
+          if(fid){
+            get('api/branchplane/list', {
+               fid:fid,
+            }).then((res) => {
+                if(res.code==0){
+                  let json = JSON.parse(res.data[0].currentContext);
+                      DataFactory.putLocalStorage('building',json);
+                      this.mapName = res.data[0].mapName;
+                      this.create();
+                }
+            })
+          }else{
+            this.mapName = "";
+            this.create();
+          }
+        },
+        showBranch(){
+         this.branchSelectShow='block';
+         this.selectBranchList();
+        },
+        closeBranch(){
+         this.branchSelectShow='none';
+        },
+        selectBranch(row){
+          let branch = row;
+          this.branchSelectShow='none';
+          this.form.shopNo = branch.branchCode;
+          this.form.name = branch.branchName;
+          this.form.name_us = branch.shortName;
+          this.form.fid = branch.fid;
+        },
+        branchNameReset(){
+          this.branchSelectName = "";
+        },
+        selectBranchList(){
+          get('api/branchinfo/list', {
+             branchNameOrCode: this.branchSelectName,
+          }).then((res) => {
+              if(res.code==0){
+                let tempFatherList = [];
+                let tempFatherIndex = {};
+                let tempchildrenList = [];
+                for(var i=0;i<res.data.length;i++){
+                  let branch = res.data[i];
+                  if(branch.fatherId==0){
+                    branch.children=[];
+                    let fid = branch.fid;
+                    tempFatherIndex[fid] = branch;
+                    tempFatherList.push(branch);
+                  }else{
+                    let fatherId = branch.fatherId;
+                    tempFatherIndex[fatherId].children.push(branch);
+                  }
+                }
+                this.branchList = tempFatherList;
+                console.log(tempFatherList);
+              }else{
+                this.$message('请登录！');
+              }
+          })
+        },
       },
       mounted () {
-
 
 
       }
@@ -754,7 +1028,7 @@
     position: fixed;
     top: 10%;
     background-color: white;
-    height: 700px;
+    height: 650px;
     width: 280px;
     z-index: 999;
     border: solid 1px #B1B0B1;
@@ -779,7 +1053,7 @@
   }
 
   .menu-right .property{
-    margin: 25px 0;
+    margin: 15px 0;
   }
 
   .menu-right .property span{
@@ -845,7 +1119,7 @@
 
   .file {
     padding: 4px 10px;
-    height: 15px;
+    height: 25px;
     line-height: 15px;
     position: relative;
     cursor: pointer;
@@ -856,7 +1130,7 @@
     overflow: hidden;
     display: inline-block;
     float: right;
-    margin-right: 80px;
+    margin-right: 60px;
   }
   .file input {
     position: absolute;
@@ -873,9 +1147,82 @@
     border-color: #ccc;
     text-decoration: none
   }
+  table tr td {
+    border:1px solid #000000
+  }
 
+	/* The Modal (background) */
+  .modal {
+      position: fixed; /* Stay in place */
+      z-index: 999; /* Sit on top */
+      padding-top: 20px; /* Location of the box */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: rgb(0,0,0); /* Fallback color */
+      background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  }
 
+  /* Modal Content */
+  .modal-content {
+      position: relative;
+      background-color: #fefefe;
+      margin: auto;
+      padding: 0;
+      border: 1px solid #888;
+      width: 600px;
+      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+      -webkit-animation-name: animatetop;
+      -webkit-animation-duration: 0.4s;
+      animation-name: animatetop;
+      animation-duration: 0.4s
+  }
 
+  /* Add Animation */
+  @-webkit-keyframes animatetop {
+      from {top:-300px; opacity:0}
+      to {top:0; opacity:1}
+  }
 
+  @keyframes animatetop {
+      from {top:-300px; opacity:0}
+      to {top:0; opacity:1}
+  }
 
+  /* The Close Button */
+  .close {
+      color: white;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+  }
+
+  .close:hover,
+  .close:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+  }
+
+  .modal-header {
+      padding: 2px 16px;
+      background-color: #5cb85c;
+      color: white;
+  }
+
+  .modal-body {padding: 2px 16px;}
+
+  .modal-footer {
+      padding: 2px 16px;
+      background-color: #5cb85c;
+      color: white;
+  }
+  .attr-label{
+    color: #009988;
+  }
+  .attr-value{
+    color: #000000;
+  }
 </style>

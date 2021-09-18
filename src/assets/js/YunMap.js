@@ -5,6 +5,8 @@
  */
 
 import YunMap3d from "./YunMap3d";
+import {jsonp} from "../jsonptool.js"
+import {post,get,patch,put} from "../axiostool.js"
 
 
 const YunMap = {
@@ -36,13 +38,28 @@ const YunMap = {
 
     if (is3d) {
       yunMap = new YunMap3d(yunDom);
-      yunMap.load(e.url,e.mold,e.theme,function () {
-        // 加载文字信息
-        document.body.appendChild(YunMap.GUI(yunMap));
-        YunMap.enlarge();
-      });
+      let fid  = (decodeURIComponent((new RegExp('[?|&]' + 'fid' + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null);
+      if(fid){
+        get('shopinteriormap/list', {
+          fid: fid,
+          }).then((res) => {
+              if(res.code==0){
+                let json = JSON.parse(res.data[0].currentContext);
+                yunMap.load(json,e.mold,e.theme,function () {
+                  // 加载文字信息
+                  document.body.appendChild(YunMap.GUI(yunMap));
+                  YunMap.enlarge();
+                });
+              }
+          })
+      }else{
+        yunMap.load(e.url,e.mold,e.theme,function () {
+          // 加载文字信息
+          document.body.appendChild(YunMap.GUI(yunMap));
+          YunMap.enlarge();
+        });
+      }
     }
-
   },
 
   /** 界面 */
@@ -55,6 +72,9 @@ const YunMap = {
     floor.className = 'floorsUI';
     li = document.createElement('li');
     text = document.createTextNode('全部');
+    if(floors.length<=1){
+      li.style.cssText="display:none;";
+    }
     li.appendChild(text);
     li.onclick = function (e) {
 
