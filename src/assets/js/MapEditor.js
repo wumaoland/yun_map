@@ -80,7 +80,7 @@ export default class {
     } else {
       this.shapePoints.push(point);
     }
-    let pointsGeometry = new THREE.Geometry().setFromPoints(this.shapePoints);
+    let pointsGeometry = new THREE.BufferGeometry().setFromPoints(this.shapePoints);
     // 线条
     let config = {
         color: "#fd0028",
@@ -234,7 +234,7 @@ export default class {
       let point = new THREE.Vector2(xy[j][0], xy[j][1]);
       points.push(point);
     }
-    let pointsGeometry = new THREE.Geometry().setFromPoints(points);
+    let pointsGeometry = new THREE.BufferGeometry().setFromPoints(points);
     // 线条
     let config = {
       color: "#161823",
@@ -256,7 +256,7 @@ export default class {
         let point = new THREE.Vector2(xy[j][0], xy[j][1]);
         points.push(point);
       }
-      let pointsGeometry = new THREE.Geometry().setFromPoints(points);
+      let pointsGeometry = new THREE.BufferGeometry().setFromPoints(points);
       // 线条
       let config = {
         color: colour,
